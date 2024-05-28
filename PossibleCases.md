@@ -16,7 +16,10 @@ tcp6       0      0  *.80                   *.*                    LISTEN
 It means our both **22 and 80 ports** are **open**. 
 
 - To check which vulnerabilities occur, we have to type this command.
-- sudo lsof -i -P -n | grep LISTEN
+
+ ```bash
+sudo lsof -i -P -n | grep LISTEN
+```
 
 It will give output like this: 
 
@@ -25,7 +28,7 @@ sshd       5335            root    4u  IPv6 0x39d7de6dc7705f2f      0t0    TCP *
 sshd       5335            root    5u  IPv4 0x39d7de728425321f      0t0    TCP *:80 (LISTEN)
 sshd       5335            root    6u  IPv6 0x39d7de6dc7708f2f      0t0    TCP *:22 (LISTEN)
 sshd       5335            root    7u  IPv4 0x39d7de728425268f      0t0    TCP *:22 (LISTEN)
-```
+
 
 - So we can see that **"ssh"**: "Potential weak passwords in SSH service can be occur.
 - Let's run the program.
