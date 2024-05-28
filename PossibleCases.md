@@ -38,7 +38,7 @@ python PortShield_CyberSec.py
 - If IP address unknown this command can be entered:
 
 ```bash
-ipconfig getifaddr en0
+1
 ```
 
 ```bash
@@ -84,4 +84,19 @@ echo -e "HTTP/1.1 200 OK\r\n\r\n" | ncat -l 8080
 - Port 2222 has to be generated with **ssh vulnerabilities**
 - Port 8080 has to be generated with **http vulnerabilities**
 
-- If port is occupied, please replace port numbers with another one. 
+- If port is occupied, please replace port numbers with another one.
+
+ <img width="1141" alt="Ekran Resmi 2024-05-28 14 59 12" src="https://github.com/xkyleann/PortShield_CyberSec/assets/128597547/76a01654-e582-414f-a1fa-6ec65689663e">
+
+- As seen, ports are opened: 
+```bash
+tcp4       0      0  *.8080                 *.*                    LISTEN     
+tcp6       0      0  *.8080                 *.*                    LISTEN     
+tcp4       0      0  *.2222                 *.*                    LISTEN     
+tcp6       0      0  *.2222                 *.*                    LISTEN     
+tcp4       0      0  *.2221                 *.*                    LISTEN     
+tcp6       0      0  *.2221  
+```
+
+- As seen, ports are opened: 
+- Let say port 2222 as HTTP
