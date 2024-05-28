@@ -1,9 +1,18 @@
-# Example IP Address: 127.0.0.1
+# Example IP Address: 127.0.0.1  
 # Start Port: 2221
 # End Port: 8080
-# echo -e "220 (vsFTPd 3.0.3)" | ncat -l 2221
+# simulation of ports -> echo -e "220 (vsFTPd 3.0.3)" | ncat -l 2221  
 # echo -e "SSH-2.0-OpenSSH_7.4" | ncat -l 2222
 # echo -e "HTTP/1.1 200 OK\r\n\r\n" | ncat -l 8080
+# nc 127.0.0.1 2221
+
+# netstat -an | grep LISTEN  -> to learn open ports 
+# sudo lsof -i -P -n | grep LISTEN --> PID associated with the port
+# python PortShiled_CyberSec.py
+
+#
+ 
+
 import socket
 import threading
 import ipaddress
@@ -25,37 +34,44 @@ def banner_grab(ip, port):
         try:
             s.connect((ip, port))
 
-            # HTTP Check
-            s.send(b'HEAD / HTTP/1.1\r\nHost: %s\r\n\r\n' % ip.encode())
-            banner = s.recv(1024).decode().strip()
-            if "HTTP" in banner:
+            # HTTP  
+            s.send(b'HEAD / HTTP/1.1\r\nHost: %s\r\n\r\n' % ip.encode()) # goes to socket,
+            banner = s.recv(1024).decode().strip() # response analyze,
+            print(f"banner on port {port}: {banner}")
+            if "HTTP" in banner: # if there is something related to http, it will counted as HTTP 
                 return "http"
 
-            # SSH Check
-            s.send(b'SSH-2.0-OpenSSH_7.4\r\n')
+            # SSH 
+            s.send(b'SSH-2.0-OpenSSH_7.4\r\n') # b -> bytes , 1024 bytes of data  2^10 -> memort alignment fit 
             banner = s.recv(1024).decode().strip()
+            print(f"banner on port {port}: {banner}")
             if "SSH" in banner:
                 return "ssh"
 
-            # FTP Check
+            # FTP 
             s.send(b'USER anonymous\r\n')
             banner = s.recv(1024).decode().strip()
+            print(f"banner on port {port}: {banner}")
             if "220" in banner:
                 return "ftp"
 
-            # Telnet Check
+            # Telnet 
             s.send(b'\xFF\xFB\x01\xFF\xFB\x03\xFF\xFD\x1F')  # Telnet negotiation
             banner = s.recv(1024).decode().strip()
+            print(f"banner on port {port}: {banner}")
             if "Telnet" in banner or "Welcome" in banner:
                 return "telnet"
 
-            # HTTPS Check
+            # HTTPS 
             s.send(b'HEAD / HTTP/1.1\r\nHost: %s\r\n\r\n' % ip.encode())
             banner = s.recv(1024).decode().strip()
             if "HTTPS" in banner:
                 return "https"
+            
         except Exception as e:
+            print(f"Error on port {port}: {e}")
             pass
+
 
     return "unknown"
 
@@ -113,3 +129,5 @@ if __name__ == "__main__":
             print(f"Port {port} (service: {service}) - {vulnerability}")
     else:
         print("No known vulnerabilities found.")
+
+
