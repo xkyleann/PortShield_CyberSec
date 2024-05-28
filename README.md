@@ -81,6 +81,47 @@ Open ports: [(22, 'ssh'), (80, 'http')]
 Vulnerabilities found:
 Port 22 (service: ssh) - Potential weak passwords in SSH service.
 Port 80 (service: http) - Check for outdated web servers or known exploits.
-
 ```
+
+## To test ports (Cases)
+
+**1** FTP on Port 2221
+```bash
+echo -e "220 (vsFTPd 3.0.3)" | nc -l 2221
+```
+
+**2** SSH on Port 2222
+```bash
+echo -e "SSH-2.0-OpenSSH_7.4" | ncat -l 2222
+```
+
+**3** HTTP on Port 8080
+```bash
+echo -e "HTTP/1.1 200 OK\r\n\r\n" | ncat -l 8080 
+```
+
+**Expected Output** 
+- IP Address: 127.0.0.1
+- Start Port: 2221
+- End Port: 8080
+
+```bash
+
+Enter IP address to scan: 127.0.0.1
+Enter start port: 2221
+Enter end port: 8080
+Scanning 127.0.0.1 from port 2221 to 8080...
+DEBUG: Banner from port 2221 - 220 (vsFTPd 3.0.3)
+Port 2221 is open and running ftp.
+DEBUG: Banner from port 2222 - SSH-2.0-OpenSSH_7.4
+Port 2222 is open and running ssh.
+DEBUG: Banner from port 8080 - HTTP/1.1 200 OK
+Port 8080 is open and running http.
+Open ports: [(2221, 'ftp'), (2222, 'ssh'), (8080, 'http')]
+Vulnerabilities found:
+Port 2221 (service: ftp) - Known vulnerabilities in FTP service.
+Port 2222 (service: ssh) - Potential weak passwords in SSH service.
+Port 8080 (service: http) - Check for outdated web servers or known exploits.
+```
+
 
