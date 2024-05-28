@@ -1,6 +1,9 @@
-# Example IP Address: 192.168.1.1  
-# Start Port: 1 
-# End Port: 100 
+# Example IP Address: 127.0.0.1
+# Start Port: 2221
+# End Port: 8080
+# echo -e "220 (vsFTPd 3.0.3)" | ncat -l 2221
+# echo -e "SSH-2.0-OpenSSH_7.4" | ncat -l 2222
+# echo -e "HTTP/1.1 200 OK\r\n\r\n" | ncat -l 8080
 import socket
 import threading
 import ipaddress
