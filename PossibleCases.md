@@ -32,6 +32,7 @@ sshd       5335            root    7u  IPv4 0x39d7de728425268f      0t0    TCP *
 
 - So we can see that **"ssh"**: "Potential weak passwords in SSH service can be occur.
 - Let's run the program.
+```
 
 ```bash
 python PortShield_CyberSec.py
