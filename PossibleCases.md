@@ -110,7 +110,7 @@ ftp        5335            root    6u  IPv6 0x39d7de6dc7708f2f      0t0    TCP *
 ftp        5335            root    7u  IPv4 0x39d7de728425268f      0t0    TCP *:2221 (LISTEN)
 ```
 
-- As seen, ports are opened: 
+- Expected Output:
 
 ```bash
 Enter IP address to scan: XXX.XXX.X.XX
