@@ -21,7 +21,7 @@ It means our both **22 and 80 ports** are **open**.
 It will give output like this: 
 
 ```bash
-sshd      5335            root    4u  IPv6 0x39d7de6dc7705f2f      0t0    TCP *:80 (LISTEN)
+sshd       5335            root    4u  IPv6 0x39d7de6dc7705f2f      0t0    TCP *:80 (LISTEN)
 sshd       5335            root    5u  IPv4 0x39d7de728425321f      0t0    TCP *:80 (LISTEN)
 sshd       5335            root    6u  IPv6 0x39d7de6dc7708f2f      0t0    TCP *:22 (LISTEN)
 sshd       5335            root    7u  IPv4 0x39d7de728425268f      0t0    TCP *:22 (LISTEN)
@@ -38,14 +38,14 @@ python PortShield_CyberSec.py
 - If IP address unknown this command can be entered:
 
 ```bash
-1
+ipconfig
 ```
 
 ```bash
 Enter IP address to scan: XXX.XXX.X.XX
 Enter start port: 1
 Enter end port: 80
-Scanning 192.168.1.26 from port 1 to 80...
+Scanning XXX.XXX.X.XX from port 1 to 80...
 banner on port 22: SSH-2.0-OpenSSH_9.6
 banner on port 22: Invalid SSH identification string.
 Port 22 is open and running ssh.
@@ -63,7 +63,7 @@ Port 80 (service: ssh) - Potential weak passwords in SSH service.
 --- 
 
 ## Case 2
-- Testing program with virtual ports as simulation.
+- Testing program with **virtual ports** as simulation.
 
 - To create virtual ports:
 
@@ -94,9 +94,45 @@ tcp4       0      0  *.8080                 *.*                    LISTEN
 tcp6       0      0  *.8080                 *.*                    LISTEN     
 tcp4       0      0  *.2222                 *.*                    LISTEN     
 tcp6       0      0  *.2222                 *.*                    LISTEN     
-tcp4       0      0  *.2221                 *.*                    LISTEN     
+tcp4       0      0  *.2221                 *.*                    LISTEN
 tcp6       0      0  *.2221  
 ```
 
+```bash
+http       5335            root    4u  IPv6 0x39d7de6dc7705f2f      0t0    TCP *:8080 (LISTEN)
+http       5335            root    5u  IPv4 0x39d7de728425321f      0t0    TCP *:8080 (LISTEN)
+sshd       5335            root    6u  IPv6 0x39d7de6dc7708f2f      0t0    TCP *:2222 (LISTEN)
+sshd       5335            root    7u  IPv4 0x39d7de728425268f      0t0    TCP *:2222 (LISTEN)
+ftp        5335            root    6u  IPv6 0x39d7de6dc7708f2f      0t0    TCP *:2221 (LISTEN)
+ftp        5335            root    7u  IPv4 0x39d7de728425268f      0t0    TCP *:2221 (LISTEN)
+```
+
 - As seen, ports are opened: 
-- Let say port 2222 as HTTP
+
+```bash
+Enter IP address to scan: XXX.XXX.X.XX
+Enter start port: 2020
+Enter end port: 8080
+Scanning XXX.XXX.X.XX from port 1 to 80...
+banner on port 8080: HTTP/1.1 200 OK\r\n\r\n
+banner on port 8080: Invalid HTTP identification string.
+Port 8080 is open and running http.
+banner on port 2222: SSH-2.0-OpenSSH_7.4
+banner on port 2222: Invalid SSH identification string.
+Port 2222 is open and running ssh.
+banner on port 2221: 220 (vsFTPd 3.0.3)
+banner on port 2221: Invalid FTP identification string.
+Port 2221 is open and running ftp.
+banner on port 80: SSH-2.0-OpenSSH_9.6
+Open ports: [(8080, 'http'), (2222, 'ssh'),(2221,'ftp')]
+Vulnerabilities found:
+Port 8080 (service: http) - Check for outdated web servers or known exploits.
+Port 2222 (service: ssh)  - Potential weak passwords in SSH service.
+Port 2221 (service: ftp)  - Known vulnerabilities in FTP service.
+```
+---
+
+<img width="810" alt="Ekran Resmi 2024-05-28 17 22 46" src="https://github.com/xkyleann/PortShield_CyberSec/assets/128597547/917b5203-4c7b-4f81-bd83-3c53d86023c7">
+
+
+
