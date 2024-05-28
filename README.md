@@ -49,11 +49,6 @@ python -m venv venv
 source venv/bin/activate  # On Windows use `venv\Scripts\activate`
 ```
 
-**4.** Install necessary dependencies (if any):
-
-```bash
-pip install -r requirements.txt  # Currently, no external dependencies are required
-```
 
 ## Usage
 **1.** Run the port scanner script:
