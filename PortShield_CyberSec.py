@@ -1,18 +1,34 @@
 # Example IP Address: 127.0.0.1  
 # Start Port: 2221
 # End Port: 8080
-# simulation of ports -> echo -e "220 (vsFTPd 3.0.3)" | ncat -l 2221  
-# echo -e "SSH-2.0-OpenSSH_7.4" | ncat -l 2222
-# echo -e "HTTP/1.1 200 OK\r\n\r\n" | ncat -l 8080
-# nc 127.0.0.1 2221
+# simulation of ports -> echo -e "HTTP/1.1 200 OK\r\n\r\n" | nc -l 8080
+# echo -e "SSH-2.0-OpenSSH_7.4" | nc -l 2222
+# echo -e "220 (vsFTPd 3.0.3)" | nc -l 21
+# echo -e "Telnet Banner\r\n" | nc -l  23
 
-# netstat -an | grep LISTEN  -> to learn open ports 
-# sudo lsof -i -P -n | grep LISTEN --> PID associated with the port
-# python PortShiled_CyberSec.py
+#----
+# Enter IP address to scan: 127.0.0.1
+# Enter start port: 1
+# Enter end port: 8080
+
+"""
+Scanning 127.0.0.1 from port 1 to 8080...
+Port 21 is open and running ftp.
+Port 23 is open and running telnet.
+Port 2222 is open and running ssh.
+Port 8080 is open and running http.
+Open ports: [(21, 'ftp'), (23, 'telnet'), (2222, 'ssh'), (8080, 'http')]
+Vulnerabilities found:
+Port 21 (service: ftp) - Known vulnerabilities in FTP service.
+Port 23 (service: telnet) - Telnet is insecure and should not be used.
+Port 2222 (service: ssh) - Potential weak passwords in SSH service.
+Port 8080 (service: http) - Check for outdated web servers or known exploits.
+"""
 
 import socket
 import threading
 import ipaddress
+from concurrent.futures import ThreadPoolExecutor
 
 # descriptions
 vulnerable_services = {
@@ -26,103 +42,80 @@ vulnerable_services = {
     "afs3-fileserver": "Security issues in AFS3 File Server service.",
     "smtp": "Potential email relay and spamming vulnerabilities in SMTP service.",
     "pop3": "Risk of unauthorized access to email messages in POP3 service."
-
 }
 
-
-# grab the banner of the service running on a port -> for other cases that mentioned 
-# such as port 80 not HTTP but working as SSH
 def banner_grab(ip, port):
     with socket.socket() as s:
         s.settimeout(1)
         try:
             s.connect((ip, port))
-
-            # HTTP  
-            s.send(b'HEAD / HTTP/1.1\r\nHost: %s\r\n\r\n' % ip.encode()) # goes to socket,
-            banner = s.recv(1024).decode().strip() # response analyze,
-            print(f"banner on port {port}: {banner}")
-            if "HTTP" in banner: # if there is something related to http, it will counted as HTTP 
-                return "http"
-
-            # SSH 
-            s.send(b'SSH-2.0-OpenSSH_7.4\r\n') # b -> bytes , 1024 bytes of data  2^10 -> memory alignment fit 
+            # HTTP
+            s.send(b'HEAD / HTTP/1.1\r\nHost: %s\r\n\r\n' % ip.encode())
             banner = s.recv(1024).decode().strip()
-            print(f"banner on port {port}: {banner}")
+            if "HTTP" in banner:
+                return "http"
+            # SSH
+            s.send(b'SSH-2.0-OpenSSH_7.4\r\n')
+            banner = s.recv(1024).decode().strip()
             if "SSH" in banner:
                 return "ssh"
-
-            # FTP 
+            # FTP
             s.send(b'USER anonymous\r\n')
             banner = s.recv(1024).decode().strip()
-            print(f"banner on port {port}: {banner}")
             if "220" in banner:
                 return "ftp"
-
-            # Telnet 
+            # Telnet
             s.send(b'\xFF\xFB\x01\xFF\xFB\x03\xFF\xFD\x1F')  # Telnet negotiation
             banner = s.recv(1024).decode().strip()
-            print(f"banner on port {port}: {banner}")
             if "Telnet" in banner or "Welcome" in banner:
                 return "telnet"
-
-            # HTTPS 
+            # HTTPS
             s.send(b'HEAD / HTTP/1.1\r\nHost: %s\r\n\r\n' % ip.encode())
             banner = s.recv(1024).decode().strip()
             if "HTTPS" in banner:
                 return "https"
-            
-            # hbci 
-            if port == 3000: #change
+            # HBCI
+            if port == 3000:
                 s.send(b'HBCI banner request\r\n')
                 banner = s.recv(1024).decode().strip()
-                print(f"banner on port {port}: {banner}")
                 if "HBCI" in banner:
                     return "hbci"
-                
-            # commplex-main 
-            if port == 5000: #change
+            # Commplex-Main
+            if port == 5000:
                 s.send(b'Commplex-Main banner request\r\n')
                 banner = s.recv(1024).decode().strip()
-                print(f"banner on port {port}: {banner}")
                 if "Commplex-Main" in banner:
                     return "commplex-main"
-
-            # afs3-fileserver 
-            if port == 7000:  #change
+            # AFS3-FileServer
+            if port == 7000:
                 s.send(b'AFS3-FileServer banner request\r\n')
                 banner = s.recv(1024).decode().strip()
-                print(f"banner on port {port}: {banner}")
                 if "AFS3-FileServer" in banner:
                     return "afs3-fileserver"
-                
-            # smtp
-            if port == 0:  #change
-                s.send(b'SMTP banner request\r\n')
+            # SMTP
+            if port == 25 or port == 587:
+                s.send(b'EHLO example.com\r\n')
                 banner = s.recv(1024).decode().strip()
-                print(f"banner on port {port}: {banner}")
                 if "SMTP" in banner:
-                    return "SMTP"
-
-            # pop3
-            if port == 0:  #change
-                s.send(b'POP3 banner request\r\n')
+                    return "smtp"
+            # POP3
+            if port == 110 or port == 995:
+                s.send(b'USER test\r\n')
                 banner = s.recv(1024).decode().strip()
-                print(f"banner on port {port}: {banner}")
                 if "POP3" in banner:
-                    return "POP3"
+                    return "pop3"
+
+            # Other services based on port-specific banners...
+            # You can add similar checks for other services
             
         except Exception as e:
             print(f"Error on port {port}: {e}")
             pass
-
-
     return "unknown"
 
-# scan port
 def scan_port(ip, port, open_ports, vulnerabilities):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-        sock.settimeout(1)  
+        sock.settimeout(1)
         if sock.connect_ex((ip, port)) == 0:
             try:
                 service = socket.getservbyport(port)
@@ -133,38 +126,32 @@ def scan_port(ip, port, open_ports, vulnerabilities):
             if service in vulnerable_services:
                 vulnerabilities.append((port, service, vulnerable_services[service]))
 
-# scan a range of ports 
 def scan_ports_range(ip, start_port, end_port):
     open_ports = []
     vulnerabilities = []
-    threads = []
-    for port in range(start_port, end_port + 1):
-        thread = threading.Thread(target=scan_port, args=(ip, port, open_ports, vulnerabilities))
-        threads.append(thread)
-        thread.start()
-
-    for thread in threads:
-        thread.join()
+    with ThreadPoolExecutor(max_workers=100) as executor:  # Limit the number of concurrent threads
+        futures = []
+        for port in range(start_port, end_port + 1):
+            futures.append(executor.submit(scan_port, ip, port, open_ports, vulnerabilities))
+        for future in futures:
+            future.result()  # Ensure all futures are completed
 
     return open_ports, vulnerabilities
 
-
 if __name__ == "__main__":
-    ip = input("Enter IP address to scan: ") # input IP address and port range
+    ip = input("Enter IP address to scan: ")
     try:
         ipaddress.ip_address(ip)
     except ValueError:
         print("Invalid IP address.")
         exit()
 
-    start_port = int(input("Enter start port: ")) 
+    start_port = int(input("Enter start port: "))
     end_port = int(input("Enter end port: "))
 
-    print(f"Scanning {ip} from port {start_port} to {end_port}...")   # port scanning process
+    print(f"Scanning {ip} from port {start_port} to {end_port}...")
     open_ports, vulnerabilities = scan_ports_range(ip, start_port, end_port)
 
-
-    # display results 
     if open_ports:
         print(f"Open ports: {[(port, service) for port, service in open_ports]}")
     else:
