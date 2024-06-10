@@ -65,7 +65,7 @@ def banner_grab(ip, port):
             if "220" in banner:
                 return "ftp"
             # Telnet
-            s.send(b'\xFF\xFB\x01\xFF\xFB\x03\xFF\xFD\x1F')  # Telnet negotiation
+            s.send(b'\xFF\xFB\x01\xFF\xFB\x03\xFF\xFD\x1F')  # Telnet 
             banner = s.recv(1024).decode().strip()
             if "Telnet" in banner or "Welcome" in banner:
                 return "telnet"
@@ -104,9 +104,6 @@ def banner_grab(ip, port):
                 banner = s.recv(1024).decode().strip()
                 if "POP3" in banner:
                     return "pop3"
-
-            # Other services based on port-specific banners...
-            # You can add similar checks for other services
             
         except Exception as e:
             print(f"Error on port {port}: {e}")
